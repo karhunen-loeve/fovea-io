@@ -1,0 +1,7 @@
+[package]
+name = "fovea-io"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Image I/O codec support for fovea"
+repository = "https://github.com/karhunen-loeve/fovea-io"
