@@ -7,7 +7,7 @@
 //! and ancillary information as [`PngMetadata`].
 //!
 //! ```no_run
-//! # use irys_cv_io::png;
+//! # use fovea_io::png;
 //! let bytes = std::fs::read("photo.png").unwrap();
 //! let decoded = png::decode(&bytes).unwrap();
 //! // Just the pixels:
@@ -73,9 +73,9 @@
 //! the pixel types that PNG can represent).
 //!
 //! ```no_run
-//! # use irys_cv::image::Image;
-//! # use irys_cv::pixel::Srgb8;
-//! # use irys_cv_io::png::{self, PngEncodeOptions};
+//! # use fovea::image::Image;
+//! # use fovea::pixel::Srgb8;
+//! # use fovea_io::png::{self, PngEncodeOptions};
 //! let image = Image::fill(320, 240, Srgb8::new(0, 0, 0));
 //! let bytes = png::encode(&image, &PngEncodeOptions::default()).unwrap();
 //! ```
@@ -96,16 +96,16 @@
 //! not implement [`PngPixel`].
 //!
 //! ```compile_fail
-//! # use irys_cv::image::Image;
-//! # use irys_cv::pixel::RgbF32;
-//! # use irys_cv_io::png::{self, PngEncodeOptions};
+//! # use fovea::image::Image;
+//! # use fovea::pixel::RgbF32;
+//! # use fovea_io::png::{self, PngEncodeOptions};
 //! // ERROR: `RgbF32` does not implement `PngPixel`
 //! let image = Image::fill(1, 1, RgbF32 { r: 0.0, g: 0.0, b: 0.0 });
 //! let _ = png::encode(&image, &PngEncodeOptions::default());
 //! ```
 
-use irys_cv::image::{Image, ImageView, PlainImage};
-use irys_cv::pixel::{
+use fovea::image::{Image, ImageView, PlainImage};
+use fovea::pixel::{
     Indexed8, Mono8, Mono16, MonoA8, MonoA16, PlainPixel, Rgb8, Rgb16, Rgba8, Rgba16, Srgb8,
     Srgb16, SrgbMono8, SrgbMono16, SrgbMonoA8, SrgbMonoA16, Srgba8, Srgba16,
 };
@@ -239,7 +239,7 @@ pub enum PngImage {
     /// `alpha = 255` and `r = g = b = 0`.
     ///
     /// To depalettise, move the palette out of the box and build a
-    /// [`Depalettize`](irys_cv::transform::Depalettize) strategy:
+    /// [`Depalettize`](fovea::transform::Depalettize) strategy:
     ///
     /// ```ignore
     /// let PngImage::Indexed8 { data, palette } = decoded.image else { /* … */ };
@@ -260,16 +260,16 @@ impl PngImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::png::PngImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::png::PngImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = PngImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// assert_eq!(img.width(), 320);
     /// ```
     #[must_use]
     pub fn width(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             PngImage::SrgbMono8(img) => img.width(),
             PngImage::SrgbMonoA8(img) => img.width(),
@@ -294,7 +294,7 @@ impl PngImage {
     /// Height in pixels, regardless of variant.
     #[must_use]
     pub fn height(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             PngImage::SrgbMono8(img) => img.height(),
             PngImage::SrgbMonoA8(img) => img.height(),
@@ -321,9 +321,9 @@ impl PngImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::png::PngImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::png::PngImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = PngImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// let sz = img.size();
@@ -331,10 +331,10 @@ impl PngImage {
     /// assert_eq!(sz.height, 240);
     /// ```
     #[must_use]
-    pub fn size(&self) -> irys_cv::Size {
+    pub fn size(&self) -> fovea::Size {
         // Reuse width/height to avoid a 17-arm match here. The width/height
         // dispatches are inlined by the compiler.
-        irys_cv::Size::new(self.width(), self.height())
+        fovea::Size::new(self.width(), self.height())
     }
 }
 
@@ -500,7 +500,7 @@ pub struct PngMetadata {
 /// Users access fields directly:
 ///
 /// ```no_run
-/// # use irys_cv_io::png::{self, PngImage};
+/// # use fovea_io::png::{self, PngImage};
 /// let decoded = png::decode(&std::fs::read("photo.png").unwrap()).unwrap();
 ///
 /// // Just the pixels — discard metadata implicitly:
@@ -629,7 +629,7 @@ impl TransferAssumption {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::png::{self, PngImage};
+/// # use fovea_io::png::{self, PngImage};
 /// let bytes = std::fs::read("photo.png").unwrap();
 /// let decoded = png::decode(&bytes).unwrap();
 ///
@@ -661,7 +661,7 @@ pub fn decode(data: &[u8]) -> Result<PngDecoded, IoError> {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::png::{self, PngImage};
+/// # use fovea_io::png::{self, PngImage};
 /// let file = std::fs::File::open("photo.png").unwrap();
 /// let reader = std::io::BufReader::new(file);
 /// let decoded = png::decode_reader(reader).unwrap();
@@ -672,7 +672,7 @@ pub fn decode(data: &[u8]) -> Result<PngDecoded, IoError> {
 /// }
 /// ```
 pub fn decode_reader(reader: impl std::io::Read) -> Result<PngDecoded, IoError> {
-    use irys_cv::pixel::PlainPixel;
+    use fovea::pixel::PlainPixel;
     use png::{BitDepth, ColorType, Transformations};
 
     // ── Configure decoder ────────────────────────────────────────────────
@@ -1570,7 +1570,7 @@ pub enum PngFilterStrategy {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::png::PngEncodeOptions;
+/// use fovea_io::png::PngEncodeOptions;
 ///
 /// // All defaults — no text, no timestamp, default compression.
 /// let opts = PngEncodeOptions::default();
@@ -1579,7 +1579,7 @@ pub enum PngFilterStrategy {
 /// ```
 ///
 /// ```
-/// use irys_cv_io::png::{PngEncodeOptions, PngFilterStrategy, PngTimestamp};
+/// use fovea_io::png::{PngEncodeOptions, PngFilterStrategy, PngTimestamp};
 ///
 /// let mut opts = PngEncodeOptions::default();
 /// opts.compression_level = Some(9);
@@ -1640,9 +1640,9 @@ pub struct PngEncodeOptions {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::png::{self, PngEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::png::{self, PngEncodeOptions};
 /// let image: Image<Srgb8> = todo!();
 /// let bytes = png::encode(&image, &PngEncodeOptions::default()).unwrap();
 /// std::fs::write("output.png", bytes).unwrap();
@@ -1673,9 +1673,9 @@ pub fn encode<P: PngPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::png::{self, PngEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::png::{self, PngEncodeOptions};
 /// let image: Image<Srgb8> = todo!();
 /// let mut out = Vec::new();
 /// png::encode_writer(&image, &mut out, &PngEncodeOptions::default()).unwrap();
@@ -1751,9 +1751,9 @@ pub fn encode_writer<P: PngPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::{Indexed8, Srgba8};
-/// # use irys_cv_io::png::{self, PngEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::{Indexed8, Srgba8};
+/// # use fovea_io::png::{self, PngEncodeOptions};
 /// let image: Image<Indexed8> = todo!();
 /// let palette = [Srgba8::new(255, 0, 0, 255), Srgba8::new(0, 255, 0, 255)];
 /// let bytes = png::encode_indexed(&image, &palette, &PngEncodeOptions::default()).unwrap();
@@ -1856,7 +1856,7 @@ fn encode_indexed_writer(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::png::{self, PngEncodeOptions};
+/// # use fovea_io::png::{self, PngEncodeOptions};
 /// let decoded = png::decode(&std::fs::read("photo.png").unwrap()).unwrap();
 /// let bytes = png::encode_png_image(&decoded.image, &PngEncodeOptions::default()).unwrap();
 /// std::fs::write("copy.png", bytes).unwrap();
@@ -2001,7 +2001,7 @@ fn write_time_chunk<W: std::io::Write>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use irys_cv::image::ContiguousImage;
+    use fovea::image::ContiguousImage;
     use std::mem;
     use std::num::Saturating;
 
@@ -2128,7 +2128,7 @@ mod tests {
             pixel_dimensions: Some((3780, 3780, 1)),
             text_chunks: vec![PngTextChunk {
                 keyword: "Software".into(),
-                text: "irys-cv-io".into(),
+                text: "fovea-io".into(),
                 language: None,
                 translated_keyword: None,
             }],
@@ -2248,7 +2248,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_8bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×2 grayscale 8-bit image: pixel values 10, 20, 30, 40
         let data = [10u8, 20, 30, 40];
         let png_data = encode_png(2, 2, png::ColorType::Grayscale, png::BitDepth::Eight, &data);
@@ -2269,7 +2269,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_16bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×1 grayscale 16-bit: big-endian values 1000, 60000
         let mut data = Vec::new();
         data.extend_from_slice(&1000u16.to_be_bytes());
@@ -2296,7 +2296,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_1bit_full_range_scaling() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 8×1, 1-bit: alternating 0 and 1 packed into one byte = 0b01010101 = 0x55
         let data = [0x55u8];
         let png_data = encode_png(8, 1, png::ColorType::Grayscale, png::BitDepth::One, &data);
@@ -2317,7 +2317,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_4bit_full_range_scaling() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×1, 4-bit: values 0 and 15 packed into 0x0F
         let data = [0x0Fu8];
         let png_data = encode_png(2, 1, png::ColorType::Grayscale, png::BitDepth::Four, &data);
@@ -2335,7 +2335,7 @@ mod tests {
 
     #[test]
     fn decode_rgb_8bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 1×1 RGB: (100, 150, 200)
         let data = [100u8, 150, 200];
         let png_data = encode_png(1, 1, png::ColorType::Rgb, png::BitDepth::Eight, &data);
@@ -2354,7 +2354,7 @@ mod tests {
 
     #[test]
     fn decode_rgba_8bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 1×1 RGBA: (10, 20, 30, 128)
         let data = [10u8, 20, 30, 128];
         let png_data = encode_png(1, 1, png::ColorType::Rgba, png::BitDepth::Eight, &data);
@@ -2370,7 +2370,7 @@ mod tests {
 
     #[test]
     fn decode_rgb_16bit_endianness() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 1×1 RGB 16-bit: (0x1234, 0x5678, 0x9ABC)
         let mut data = Vec::new();
         data.extend_from_slice(&0x1234u16.to_be_bytes());
@@ -2390,7 +2390,7 @@ mod tests {
 
     #[test]
     fn decode_rgba_16bit_endianness() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 1×1 RGBA 16-bit
         let mut data = Vec::new();
         data.extend_from_slice(&100u16.to_be_bytes());
@@ -2411,7 +2411,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_alpha_8bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×1 GA 8-bit: (100, 255), (200, 128)
         let data = [100u8, 255, 200, 128];
         let png_data = encode_png(
@@ -2439,7 +2439,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_alpha_16bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 1×1 GA 16-bit
         let mut data = Vec::new();
         data.extend_from_slice(&1000u16.to_be_bytes());
@@ -2465,7 +2465,7 @@ mod tests {
 
     #[test]
     fn decode_indexed_8bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×1 indexed with a 3-entry palette
         let palette = [
             255u8, 0, 0, // entry 0: red
@@ -2544,7 +2544,7 @@ mod tests {
 
     #[test]
     fn decode_preserves_dimensions() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = vec![0u8; 17 * 31 * 3]; // 17×31 RGB
         let png_data = encode_png(17, 31, png::ColorType::Rgb, png::BitDepth::Eight, &data);
         let decoded = decode(&png_data).unwrap();
@@ -2572,7 +2572,7 @@ mod tests {
 
     #[test]
     fn decode_reader_from_cursor() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = [10u8, 20, 30];
         let png_data = encode_png(1, 1, png::ColorType::Rgb, png::BitDepth::Eight, &data);
         let cursor = std::io::Cursor::new(png_data);
@@ -2589,7 +2589,7 @@ mod tests {
     /// Encode → decode roundtrip for RGB 8-bit: all pixels must be exact.
     #[test]
     fn roundtrip_rgb8_pixel_exact() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 4×2 image with distinct pixel values
         let data: Vec<u8> = (0..24).collect(); // 4×2×3 = 24 bytes
         let png_data = encode_png(4, 2, png::ColorType::Rgb, png::BitDepth::Eight, &data);
@@ -2618,7 +2618,7 @@ mod tests {
     /// Encode → decode roundtrip for RGB 16-bit.
     #[test]
     fn roundtrip_rgb16_pixel_exact() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let pixels_native: Vec<(u16, u16, u16)> = vec![(0, 32768, 65535), (1000, 2000, 3000)];
 
         // Encode as big-endian bytes (PNG 16-bit format).
@@ -2647,7 +2647,7 @@ mod tests {
     /// Encode → decode roundtrip for Mono16.
     #[test]
     fn roundtrip_mono16_pixel_exact() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let values: Vec<u16> = vec![0, 1, 32768, 65534, 65535];
         let mut data = Vec::new();
         for v in &values {
@@ -2680,7 +2680,7 @@ mod tests {
 
     #[test]
     fn decode_grayscale_2bit_full_range_scaling() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 4×1, 2-bit: values 0, 1, 2, 3 packed into one byte = 0b00_01_10_11 = 0x1B
         let data = [0x1Bu8];
         let png_data = encode_png(4, 1, png::ColorType::Grayscale, png::BitDepth::Two, &data);
@@ -2891,7 +2891,7 @@ mod tests {
 
     #[test]
     fn decode_linear_grayscale_8bit_via_gamma() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×2 grayscale 8-bit with gAMA = 1.0 (linear).
         let data = [10u8, 20, 30, 40];
         let png_data = encode_png_with_gamma(
@@ -2919,7 +2919,7 @@ mod tests {
 
     #[test]
     fn decode_linear_rgb_8bit_via_gamma() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = [100u8, 150, 200];
         let png_data =
             encode_png_with_gamma(1, 1, png::ColorType::Rgb, png::BitDepth::Eight, 1.0, &data);
@@ -2935,7 +2935,7 @@ mod tests {
 
     #[test]
     fn decode_linear_rgba_8bit_via_gamma() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = [10u8, 20, 30, 128];
         let png_data =
             encode_png_with_gamma(1, 1, png::ColorType::Rgba, png::BitDepth::Eight, 1.0, &data);
@@ -2951,7 +2951,7 @@ mod tests {
 
     #[test]
     fn decode_linear_grayscale_alpha_8bit_via_gamma() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = [100u8, 255, 200, 128];
         let png_data = encode_png_with_gamma(
             2,
@@ -2979,7 +2979,7 @@ mod tests {
 
     #[test]
     fn decode_sub_byte_grayscale_linear_1bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 8×1, 1-bit with linear gamma: alternating 0 and 1
         let data = [0x55u8]; // 0b01010101
         let png_data = encode_png_with_gamma(
@@ -3006,7 +3006,7 @@ mod tests {
 
     #[test]
     fn decode_sub_byte_grayscale_linear_4bit() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 2×1, 4-bit with linear gamma: values 0 and 15
         let data = [0x0Fu8];
         let png_data = encode_png_with_gamma(
@@ -3032,7 +3032,7 @@ mod tests {
 
     #[test]
     fn decode_srgb_grayscale_8bit_with_srgb_chunk() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let data = [42u8];
         let png_data = encode_png_with_srgb(
             1,
@@ -3069,7 +3069,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_rgb_with_srgb_chunk_produces_srgb16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let mut raw = Vec::new();
         raw.extend_from_slice(&0x1234u16.to_be_bytes());
         raw.extend_from_slice(&0x5678u16.to_be_bytes());
@@ -3095,7 +3095,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_rgba_with_srgb_chunk_produces_srgba16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let mut raw = Vec::new();
         raw.extend_from_slice(&100u16.to_be_bytes());
         raw.extend_from_slice(&200u16.to_be_bytes());
@@ -3122,7 +3122,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_grayscale_with_srgb_chunk_produces_srgb_mono16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let raw = 32768u16.to_be_bytes();
         let png_data = encode_png_with_srgb(
             1,
@@ -3144,7 +3144,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_grayscale_alpha_with_srgb_chunk_produces_srgb_mono_a16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let mut raw = Vec::new();
         raw.extend_from_slice(&1000u16.to_be_bytes());
         raw.extend_from_slice(&50000u16.to_be_bytes());
@@ -3191,7 +3191,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_rgb_with_gamma_1_produces_rgb16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let mut raw = Vec::new();
         raw.extend_from_slice(&100u16.to_be_bytes());
         raw.extend_from_slice(&200u16.to_be_bytes());
@@ -3211,7 +3211,7 @@ mod tests {
 
     #[test]
     fn decode_16bit_rgb_with_nonlinear_gamma_produces_srgb16() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         let mut raw = Vec::new();
         raw.extend_from_slice(&100u16.to_be_bytes());
         raw.extend_from_slice(&200u16.to_be_bytes());
@@ -4587,7 +4587,7 @@ mod tests {
     /// `unpack_sub_byte` with indexed data (no value-scaling).
     #[test]
     fn decode_indexed_1bit_sub_byte() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 8 pixels packed into 1 byte: indices alternate 0 and 1.
         // 0b01010101 = pixel indices [0,1,0,1,0,1,0,1]
         let palette = [
@@ -4626,7 +4626,7 @@ mod tests {
     /// Exercises the `(ColorType::Indexed, BitDepth::Four)` arm.
     #[test]
     fn decode_indexed_4bit_sub_byte() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 4 pixels at 4-bit each = 2 bytes.
         // byte 0: high nibble = index 3, low nibble = index 7  → 0x37
         // byte 1: high nibble = index 0, low nibble = index 15 → 0x0F
@@ -4663,7 +4663,7 @@ mod tests {
     /// Exercises the `(ColorType::Indexed, BitDepth::Two)` arm.
     #[test]
     fn decode_indexed_2bit_sub_byte() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 4 pixels at 2-bit each = 1 byte.
         // 0b_00_01_10_11 = 0x1B → indices [0, 1, 2, 3]
         let palette = [
@@ -4701,7 +4701,7 @@ mod tests {
     /// Exercises padding-bit handling in `unpack_sub_byte`.
     #[test]
     fn decode_sub_byte_non_aligned_width() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 3×1 at 1-bit: 3 pixels in 1 byte, 5 padding bits.
         // 0b_1_0_1_00000 = 0xA0 → pixel values [1, 0, 1]
         // After full-range scaling: [255, 0, 255]
@@ -4725,7 +4725,7 @@ mod tests {
     /// Each row is padded independently.
     #[test]
     fn decode_sub_byte_non_aligned_width_multirow() {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         // 3×2 at 1-bit: each row is 1 byte (3 pixels + 5 padding bits).
         // Row 0: 0b_1_1_0_00000 = 0xC0 → [255, 255, 0]
         // Row 1: 0b_0_1_1_00000 = 0x60 → [0, 255, 255]

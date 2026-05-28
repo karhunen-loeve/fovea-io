@@ -78,8 +78,8 @@
 //!   explicit").  Strip alpha explicitly before encoding.
 
 use crate::IoError;
-use irys_cv::image::{Image, ImageView};
-use irys_cv::pixel::{Srgb8, SrgbMono8, SrgbMono16};
+use fovea::image::{Image, ImageView};
+use fovea::pixel::{Srgb8, SrgbMono8, SrgbMono16};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // JpegImage — per-codec exhaustive output enum
@@ -107,9 +107,9 @@ use irys_cv::pixel::{Srgb8, SrgbMono8, SrgbMono16};
 /// # Examples
 ///
 /// ```
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::{Srgb8, SrgbMono8, SrgbMono16};
-/// use irys_cv_io::jpeg::JpegImage;
+/// # use fovea::image::Image;
+/// # use fovea::pixel::{Srgb8, SrgbMono8, SrgbMono16};
+/// use fovea_io::jpeg::JpegImage;
 ///
 /// // Construct each variant:
 /// let mono8 = JpegImage::SrgbMono8(Image::fill(2, 2, SrgbMono8::new(128)));
@@ -136,16 +136,16 @@ impl JpegImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::jpeg::JpegImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::jpeg::JpegImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = JpegImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// assert_eq!(img.width(), 320);
     /// ```
     #[must_use]
     pub fn width(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             JpegImage::SrgbMono8(img) => img.width(),
             JpegImage::SrgbMono16(img) => img.width(),
@@ -156,7 +156,7 @@ impl JpegImage {
     /// Height in pixels, regardless of variant.
     #[must_use]
     pub fn height(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             JpegImage::SrgbMono8(img) => img.height(),
             JpegImage::SrgbMono16(img) => img.height(),
@@ -169,9 +169,9 @@ impl JpegImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::jpeg::JpegImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::jpeg::JpegImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = JpegImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// let sz = img.size();
@@ -179,8 +179,8 @@ impl JpegImage {
     /// assert_eq!(sz.height, 240);
     /// ```
     #[must_use]
-    pub fn size(&self) -> irys_cv::Size {
-        use irys_cv::image::ImageView;
+    pub fn size(&self) -> fovea::Size {
+        use fovea::image::ImageView;
         match self {
             JpegImage::SrgbMono8(img) => img.size(),
             JpegImage::SrgbMono16(img) => img.size(),
@@ -229,7 +229,7 @@ impl std::fmt::Debug for JpegImage {
 /// ```ignore
 /// // Construction requires being inside the defining crate due to
 /// // #[non_exhaustive].  In practice, obtain via `jpeg::decode()`.
-/// use irys_cv_io::jpeg::JpegExifInfo;
+/// use fovea_io::jpeg::JpegExifInfo;
 ///
 /// let info = JpegExifInfo {
 ///     orientation: Some(1),
@@ -310,7 +310,7 @@ pub struct JpegExifInfo {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::jpeg::JpegColorSpace;
+/// use fovea_io::jpeg::JpegColorSpace;
 ///
 /// let cs = JpegColorSpace::Srgb;
 /// assert_eq!(cs, JpegColorSpace::Srgb);
@@ -340,7 +340,7 @@ pub enum JpegColorSpace {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::jpeg::JpegPixelDensity;
+/// use fovea_io::jpeg::JpegPixelDensity;
 ///
 /// let dpi = JpegPixelDensity::Dpi { x: 300, y: 300 };
 /// let dpcm = JpegPixelDensity::Dpcm { x: 118, y: 118 };
@@ -392,7 +392,7 @@ pub enum JpegPixelDensity {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::jpeg::JpegBitDepth;
+/// use fovea_io::jpeg::JpegBitDepth;
 ///
 /// let depth = JpegBitDepth::Eight;
 /// assert_eq!(depth, JpegBitDepth::Eight);
@@ -424,7 +424,7 @@ pub enum JpegBitDepth {
 /// ```ignore
 /// // Construction requires being inside the defining crate due to
 /// // #[non_exhaustive].  In practice, obtain via `jpeg::decode()`.
-/// use irys_cv_io::jpeg::{JpegMetadata, JpegColorSpace, JpegBitDepth};
+/// use fovea_io::jpeg::{JpegMetadata, JpegColorSpace, JpegBitDepth};
 ///
 /// let meta = JpegMetadata {
 ///     exif: None,
@@ -472,9 +472,9 @@ pub struct JpegMetadata {
 /// ```ignore
 /// // Construction requires being inside the defining crate due to
 /// // #[non_exhaustive].  In practice, obtain via `jpeg::decode()`.
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// use irys_cv_io::jpeg::{JpegDecoded, JpegImage, JpegMetadata, JpegColorSpace, JpegBitDepth};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// use fovea_io::jpeg::{JpegDecoded, JpegImage, JpegMetadata, JpegColorSpace, JpegBitDepth};
 ///
 /// let decoded = JpegDecoded {
 ///     image: JpegImage::Srgb8(Image::fill(1, 1, Srgb8::new(0, 0, 0))),
@@ -1240,7 +1240,7 @@ fn decode_error(e: jpeg_decoder::Error) -> IoError {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::jpeg::{self, JpegImage};
+/// # use fovea_io::jpeg::{self, JpegImage};
 /// let bytes = std::fs::read("photo.jpg").unwrap();
 /// let decoded = jpeg::decode(&bytes).unwrap();
 ///
@@ -1290,7 +1290,7 @@ pub fn decode(data: &[u8]) -> Result<JpegDecoded, IoError> {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::jpeg::{self, JpegImage};
+/// # use fovea_io::jpeg::{self, JpegImage};
 /// let file = std::fs::File::open("photo.jpg").unwrap();
 /// let reader = std::io::BufReader::new(file);
 /// let decoded = jpeg::decode_reader(reader).unwrap();
@@ -1397,7 +1397,7 @@ fn build_metadata<R: std::io::Read>(
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::jpeg::JpegSamplingFactor;
+/// use fovea_io::jpeg::JpegSamplingFactor;
 ///
 /// let factor = JpegSamplingFactor::F1x1;
 /// assert_eq!(factor, JpegSamplingFactor::F1x1);
@@ -1425,7 +1425,7 @@ pub enum JpegSamplingFactor {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::jpeg::{JpegEncodeOptions, JpegSamplingFactor};
+/// use fovea_io::jpeg::{JpegEncodeOptions, JpegSamplingFactor};
 ///
 /// // Use defaults (quality 85, encoder-default sampling, not progressive):
 /// let opts = JpegEncodeOptions::default();
@@ -1502,9 +1502,9 @@ mod jpeg_pixel_sealed {
 /// # Compile-time enforcement
 ///
 /// ```compile_fail
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Rgb8;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Rgb8;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// // ERROR: `Rgb8` does not implement `JpegPixel`.
 /// // JPEG is sRGB — encode `Srgb8` instead.
 /// let img = Image::fill(1, 1, Rgb8::new(0, 0, 0));
@@ -1512,18 +1512,18 @@ mod jpeg_pixel_sealed {
 /// ```
 ///
 /// ```compile_fail
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Mono8;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Mono8;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// // ERROR: `Mono8` does not implement `JpegPixel`.
 /// let img = Image::fill(1, 1, Mono8::new(0));
 /// let _ = jpeg::encode(&img, &JpegEncodeOptions::default());
 /// ```
 ///
 /// ```compile_fail
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgba8;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgba8;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// // ERROR: `Srgba8` does not implement `JpegPixel`.
 /// // JPEG has no alpha channel — strip alpha first.
 /// let img = Image::fill(1, 1, Srgba8::new(0, 0, 0, 255));
@@ -1531,14 +1531,14 @@ mod jpeg_pixel_sealed {
 /// ```
 ///
 /// ```compile_fail
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Rgb16;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Rgb16;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// // ERROR: `Rgb16` does not implement `JpegPixel`.
 /// let img = Image::fill(1, 1, Rgb16::new(0, 0, 0));
 /// let _ = jpeg::encode(&img, &JpegEncodeOptions::default());
 /// ```
-pub trait JpegPixel: jpeg_pixel_sealed::Sealed + irys_cv::pixel::PlainPixel {
+pub trait JpegPixel: jpeg_pixel_sealed::Sealed + fovea::pixel::PlainPixel {
     /// `jpeg-encoder` colour type for this pixel.
     const JPEG_COLOR_TYPE: jpeg_encoder::ColorType;
 }
@@ -1584,15 +1584,15 @@ fn encode_error(e: jpeg_encoder::EncodingError) -> IoError {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// let image = Image::fill(320, 240, Srgb8::new(128, 64, 32));
 /// let bytes = jpeg::encode(&image, &JpegEncodeOptions::default()).unwrap();
 /// std::fs::write("output.jpg", bytes).unwrap();
 /// ```
 pub fn encode<P: JpegPixel>(
-    image: &(impl irys_cv::image::ImageView<Pixel = P> + irys_cv::image::PlainImage),
+    image: &(impl fovea::image::ImageView<Pixel = P> + fovea::image::PlainImage),
     options: &JpegEncodeOptions,
 ) -> Result<Vec<u8>, IoError> {
     let mut buf = Vec::new();
@@ -1613,15 +1613,15 @@ pub fn encode<P: JpegPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// let image = Image::fill(320, 240, Srgb8::new(128, 64, 32));
 /// let mut out = Vec::new();
 /// jpeg::encode_writer(&image, &mut out, &JpegEncodeOptions::default()).unwrap();
 /// ```
 pub fn encode_writer<P: JpegPixel>(
-    image: &(impl irys_cv::image::ImageView<Pixel = P> + irys_cv::image::PlainImage),
+    image: &(impl fovea::image::ImageView<Pixel = P> + fovea::image::PlainImage),
     writer: impl std::io::Write,
     options: &JpegEncodeOptions,
 ) -> Result<(), IoError> {
@@ -1687,7 +1687,7 @@ pub fn encode_writer<P: JpegPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::jpeg::{self, JpegEncodeOptions};
+/// # use fovea_io::jpeg::{self, JpegEncodeOptions};
 /// let decoded = jpeg::decode(&std::fs::read("photo.jpg").unwrap()).unwrap();
 /// let bytes = jpeg::encode_jpeg_image(&decoded.image, &JpegEncodeOptions::default()).unwrap();
 /// std::fs::write("copy.jpg", bytes).unwrap();
@@ -1712,7 +1712,7 @@ pub fn encode_jpeg_image(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use irys_cv::image::ImageView;
+    use fovea::image::ImageView;
     use std::mem;
 
     // ── Minimal JPEG builder (for decode tests) ──────────────────────

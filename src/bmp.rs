@@ -7,7 +7,7 @@
 //! and ancillary information as [`BmpMetadata`].
 //!
 //! ```no_run
-//! # use irys_cv_io::bmp;
+//! # use fovea_io::bmp;
 //! let bytes = std::fs::read("photo.bmp").unwrap();
 //! let decoded = bmp::decode(&bytes).unwrap();
 //! // Just the pixels:
@@ -55,9 +55,9 @@
 //! `Srgb8` and `Srgba8`).
 //!
 //! ```no_run
-//! # use irys_cv::image::Image;
-//! # use irys_cv::pixel::Srgb8;
-//! # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+//! # use fovea::image::Image;
+//! # use fovea::pixel::Srgb8;
+//! # use fovea_io::bmp::{self, BmpEncodeOptions};
 //! let image = Image::fill(320, 240, Srgb8::new(0, 0, 0));
 //! let bytes = bmp::encode(&image, &BmpEncodeOptions::default()).unwrap();
 //! std::fs::write("output.bmp", bytes).unwrap();
@@ -73,18 +73,18 @@
 //! compile-time error — the type simply does not implement [`BmpPixel`].
 //!
 //! ```compile_fail
-//! # use irys_cv::image::Image;
-//! # use irys_cv::pixel::Rgb8;
-//! # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+//! # use fovea::image::Image;
+//! # use fovea::pixel::Rgb8;
+//! # use fovea_io::bmp::{self, BmpEncodeOptions};
 //! // ERROR: `Rgb8` does not implement `BmpPixel`
 //! let image = Image::fill(1, 1, Rgb8::new(0, 0, 0));
 //! let _ = bmp::encode(&image, &BmpEncodeOptions::default());
 //! ```
 //!
 //! ```compile_fail
-//! # use irys_cv::image::Image;
-//! # use irys_cv::pixel::SrgbMono8;
-//! # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+//! # use fovea::image::Image;
+//! # use fovea::pixel::SrgbMono8;
+//! # use fovea_io::bmp::{self, BmpEncodeOptions};
 //! // ERROR: `SrgbMono8` does not implement `BmpPixel`
 //! let image = Image::fill(1, 1, SrgbMono8::new(128));
 //! let _ = bmp::encode(&image, &BmpEncodeOptions::default());
@@ -111,8 +111,8 @@
 //! | 32-bit (no α)    | `BI_RGB` / `BI_BITFIELDS` | `Srgb8`  |
 //! | 32-bit (α)       | `BI_BITFIELDS`     | `Srgba8`          |
 
-use irys_cv::image::{Image, ImageView, PlainImage};
-use irys_cv::pixel::{Indexed8, PlainPixel, Srgb8, Srgba8};
+use fovea::image::{Image, ImageView, PlainImage};
+use fovea::pixel::{Indexed8, PlainPixel, Srgb8, Srgba8};
 
 use crate::IoError;
 
@@ -138,7 +138,7 @@ use crate::IoError;
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::bmp::{self, BmpImage};
+/// # use fovea_io::bmp::{self, BmpImage};
 /// let decoded = bmp::decode(&std::fs::read("image.bmp").unwrap()).unwrap();
 /// match decoded.image {
 ///     BmpImage::Indexed8 { data, palette } => { /* palette-indexed */ }
@@ -178,16 +178,16 @@ impl BmpImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::bmp::BmpImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::bmp::BmpImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = BmpImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// assert_eq!(img.width(), 320);
     /// ```
     #[must_use]
     pub fn width(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             BmpImage::Indexed8 { data, .. } => data.width(),
             BmpImage::Srgb8(img) => img.width(),
@@ -198,7 +198,7 @@ impl BmpImage {
     /// Height in pixels, regardless of variant.
     #[must_use]
     pub fn height(&self) -> usize {
-        use irys_cv::image::ImageView;
+        use fovea::image::ImageView;
         match self {
             BmpImage::Indexed8 { data, .. } => data.height(),
             BmpImage::Srgb8(img) => img.height(),
@@ -211,9 +211,9 @@ impl BmpImage {
     /// # Examples
     ///
     /// ```
-    /// use irys_cv_io::bmp::BmpImage;
-    /// use irys_cv::image::Image;
-    /// use irys_cv::pixel::Srgb8;
+    /// use fovea_io::bmp::BmpImage;
+    /// use fovea::image::Image;
+    /// use fovea::pixel::Srgb8;
     ///
     /// let img = BmpImage::Srgb8(Image::fill(320, 240, Srgb8::new(0, 0, 0)));
     /// let sz = img.size();
@@ -221,8 +221,8 @@ impl BmpImage {
     /// assert_eq!(sz.height, 240);
     /// ```
     #[must_use]
-    pub fn size(&self) -> irys_cv::Size {
-        use irys_cv::image::ImageView;
+    pub fn size(&self) -> fovea::Size {
+        use fovea::image::ImageView;
         match self {
             BmpImage::Indexed8 { data, .. } => data.size(),
             BmpImage::Srgb8(img) => img.size(),
@@ -386,7 +386,7 @@ pub struct BmpMetadata {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::bmp;
+/// # use fovea_io::bmp;
 /// let decoded = bmp::decode(&std::fs::read("image.bmp").unwrap()).unwrap();
 /// println!("{:?}", decoded.metadata.header_version);
 /// ```
@@ -414,7 +414,7 @@ pub struct BmpDecoded {
 /// # Examples
 ///
 /// ```
-/// # use irys_cv_io::bmp::BmpEncodeOptions;
+/// # use fovea_io::bmp::BmpEncodeOptions;
 /// let opts = BmpEncodeOptions::default();
 /// assert!(opts.resolution.is_none());
 /// ```
@@ -1222,7 +1222,7 @@ fn row_stride(width: u32, bits_per_pixel: u32) -> usize {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::bmp::{self, BmpImage};
+/// # use fovea_io::bmp::{self, BmpImage};
 /// let bytes = std::fs::read("photo.bmp").unwrap();
 /// let decoded = bmp::decode(&bytes).unwrap();
 ///
@@ -1320,7 +1320,7 @@ pub fn decode(data: &[u8]) -> Result<BmpDecoded, IoError> {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::bmp::{self, BmpImage};
+/// # use fovea_io::bmp::{self, BmpImage};
 /// let file = std::fs::File::open("photo.bmp").unwrap();
 /// let reader = std::io::BufReader::new(file);
 /// let decoded = bmp::decode_reader(reader).unwrap();
@@ -1761,9 +1761,9 @@ fn decode_failed(msg: &'static str) -> IoError {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::bmp::{self, BmpEncodeOptions};
 /// let image: Image<Srgb8> = todo!();
 /// let bytes = bmp::encode(&image, &BmpEncodeOptions::default()).unwrap();
 /// std::fs::write("output.bmp", bytes).unwrap();
@@ -1793,9 +1793,9 @@ pub fn encode<P: BmpPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::Srgb8;
-/// # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::Srgb8;
+/// # use fovea_io::bmp::{self, BmpEncodeOptions};
 /// let image: Image<Srgb8> = todo!();
 /// let mut out = Vec::new();
 /// bmp::encode_writer(&image, &mut out, &BmpEncodeOptions::default()).unwrap();
@@ -1898,9 +1898,9 @@ pub fn encode_writer<P: BmpPixel>(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv::image::Image;
-/// # use irys_cv::pixel::{Indexed8, Srgba8};
-/// # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+/// # use fovea::image::Image;
+/// # use fovea::pixel::{Indexed8, Srgba8};
+/// # use fovea_io::bmp::{self, BmpEncodeOptions};
 /// let image: Image<Indexed8> = todo!();
 /// let palette = [Srgba8::new(255, 0, 0, 255), Srgba8::new(0, 255, 0, 255)];
 /// let bytes = bmp::encode_indexed(&image, &palette, &BmpEncodeOptions::default()).unwrap();
@@ -2016,7 +2016,7 @@ fn encode_indexed_writer(
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::bmp::{self, BmpEncodeOptions};
+/// # use fovea_io::bmp::{self, BmpEncodeOptions};
 /// let decoded = bmp::decode(&std::fs::read("photo.bmp").unwrap()).unwrap();
 /// let bytes = bmp::encode_bmp_image(&decoded.image, &BmpEncodeOptions::default()).unwrap();
 /// std::fs::write("copy.bmp", bytes).unwrap();
@@ -2043,7 +2043,7 @@ fn encode_error(e: std::io::Error) -> IoError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use irys_cv::image::ImageView;
+    use fovea::image::ImageView;
 
     // ── Type definition tests ────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
-# irys-cv-io
+# fovea-io
 
-Image I/O for [irys-cv](../irys-cv) — feature-gated codec support.
+Image I/O for [fovea](../fovea) — feature-gated codec support.
 
 ## Features
 
@@ -17,9 +17,9 @@ Enable features in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-irys-cv-io = { version = "0.1", features = ["jpeg"] }
+fovea-io = { version = "0.1", features = ["jpeg"] }
 # or enable everything:
-# irys-cv-io = { version = "0.1", features = ["all-codecs"] }
+# fovea-io = { version = "0.1", features = ["all-codecs"] }
 ```
 
 ## Quick Start
@@ -27,7 +27,7 @@ irys-cv-io = { version = "0.1", features = ["jpeg"] }
 ### Format-agnostic loading
 
 ```rust,no_run
-use irys_cv_io::{load, DecodedImage};
+use fovea_io::{load, DecodedImage};
 
 let bytes = std::fs::read("image.jpg").unwrap();
 match load(&bytes).unwrap() {
@@ -46,7 +46,7 @@ match load(&bytes).unwrap() {
 ### JPEG decoding
 
 ```rust,no_run
-use irys_cv_io::jpeg::{self, JpegImage};
+use fovea_io::jpeg::{self, JpegImage};
 
 let bytes = std::fs::read("photo.jpg").unwrap();
 let decoded = jpeg::decode(&bytes).unwrap();
@@ -78,9 +78,9 @@ if let Some(exif) = &decoded.metadata.exif {
 ### JPEG encoding
 
 ```rust,no_run
-use irys_cv::image::Image;
-use irys_cv::pixel::Srgb8;
-use irys_cv_io::jpeg::{self, JpegEncodeOptions, JpegSamplingFactor};
+use fovea::image::Image;
+use fovea::pixel::Srgb8;
+use fovea_io::jpeg::{self, JpegEncodeOptions, JpegSamplingFactor};
 
 let image = Image::fill(320, 240, Srgb8::new(128, 64, 32));
 
@@ -100,7 +100,7 @@ std::fs::write("output.jpg", bytes).unwrap();
 ### PNG decoding
 
 ```rust,no_run
-use irys_cv_io::png::{self, PngImage};
+use fovea_io::png::{self, PngImage};
 
 let bytes = std::fs::read("image.png").unwrap();
 let decoded = png::decode(&bytes).unwrap();
@@ -159,7 +159,7 @@ channel, so discarding it must be an explicit user decision.
 
 ## License
 
-`irys-cv-io` itself is licensed under **MIT** — see [LICENSE](../LICENSE) for details.
+`fovea-io` itself is licensed under **MIT** — see [LICENSE](../LICENSE) for details.
 
 When the `jpeg` feature is enabled, this crate depends on
 [`jpeg-encoder`](https://crates.io/crates/jpeg-encoder) which carries an

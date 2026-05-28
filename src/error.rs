@@ -21,7 +21,7 @@
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::IoError;
+/// use fovea_io::IoError;
 ///
 /// let err = IoError::InvalidFormat { reason: "not a PNG file" };
 /// assert_eq!(err.to_string(), "invalid format: not a PNG file");

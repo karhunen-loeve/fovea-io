@@ -1,4 +1,4 @@
-//! Image I/O for irys-cv — feature-gated codec support.
+//! Image I/O for fovea — feature-gated codec support.
 //!
 //! # Architecture
 //!
@@ -64,7 +64,7 @@ pub enum ImageFormat {
 /// # Examples
 ///
 /// ```
-/// use irys_cv_io::{detect_format, ImageFormat};
+/// use fovea_io::{detect_format, ImageFormat};
 ///
 /// let png_sig = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 /// assert_eq!(detect_format(&png_sig), Some(ImageFormat::Png));
@@ -105,7 +105,7 @@ pub fn detect_format(bytes: &[u8]) -> Option<ImageFormat> {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::{load, DecodedImage};
+/// # use fovea_io::{load, DecodedImage};
 /// let bytes = std::fs::read("image.png").unwrap();
 /// match load(&bytes).unwrap() {
 ///     #[cfg(feature = "png")]
@@ -151,12 +151,12 @@ pub enum DecodedImage {
 /// # Examples
 ///
 /// ```no_run
-/// # use irys_cv_io::{load, DecodedImage};
+/// # use fovea_io::{load, DecodedImage};
 /// let bytes = std::fs::read("photo.png").unwrap();
 /// match load(&bytes).unwrap() {
 ///     #[cfg(feature = "png")]
 ///     DecodedImage::Png(decoded) => {
-///         use irys_cv_io::png::PngImage;
+///         use fovea_io::png::PngImage;
 ///         match decoded.image {
 ///             PngImage::Srgb8(image) => { /* Image<Srgb8> */ }
 ///             _ => {}
@@ -210,7 +210,7 @@ pub fn load_reader(mut reader: impl std::io::Read) -> Result<DecodedImage, IoErr
 mod tests {
     use super::*;
     #[allow(unused_imports)]
-    use irys_cv::image::ImageView;
+    use fovea::image::ImageView;
 
     // ── detect_format — positive tests per format ────────────────────────
 
@@ -341,8 +341,8 @@ mod tests {
     #[test]
     fn load_jpeg_dispatches_correctly() {
         // Build a minimal JPEG via the codec, then load() it.
-        use irys_cv::image::Image;
-        use irys_cv::pixel::Srgb8;
+        use fovea::image::Image;
+        use fovea::pixel::Srgb8;
         let img = Image::fill(4, 4, Srgb8::new(100, 150, 200));
         let bytes = jpeg::encode(&img, &jpeg::JpegEncodeOptions::default()).unwrap();
         let decoded = load(&bytes).unwrap();
@@ -362,8 +362,8 @@ mod tests {
     #[cfg(feature = "jpeg")]
     #[test]
     fn load_reader_jpeg_dispatches_correctly() {
-        use irys_cv::image::Image;
-        use irys_cv::pixel::SrgbMono8;
+        use fovea::image::Image;
+        use fovea::pixel::SrgbMono8;
         let img = Image::fill(8, 6, SrgbMono8::new(128));
         let bytes = jpeg::encode(&img, &jpeg::JpegEncodeOptions::default()).unwrap();
         let decoded = load_reader(std::io::Cursor::new(&bytes)).unwrap();
@@ -405,8 +405,8 @@ mod tests {
     #[cfg(feature = "jpeg")]
     #[test]
     fn load_jpeg_returns_metadata() {
-        use irys_cv::image::Image;
-        use irys_cv::pixel::Srgb8;
+        use fovea::image::Image;
+        use fovea::pixel::Srgb8;
         let img = Image::fill(2, 2, Srgb8::new(0, 0, 0));
         let bytes = jpeg::encode(&img, &jpeg::JpegEncodeOptions::default()).unwrap();
         let decoded = load(&bytes).unwrap();
@@ -423,8 +423,8 @@ mod tests {
     #[cfg(feature = "bmp")]
     #[test]
     fn load_bmp_dispatches_correctly() {
-        use irys_cv::image::Image;
-        use irys_cv::pixel::Srgb8;
+        use fovea::image::Image;
+        use fovea::pixel::Srgb8;
         let img = Image::fill(4, 4, Srgb8::new(100, 150, 200));
         let bytes = bmp::encode(&img, &bmp::BmpEncodeOptions::default()).unwrap();
         let decoded = load(&bytes).unwrap();
@@ -444,8 +444,8 @@ mod tests {
     #[cfg(feature = "bmp")]
     #[test]
     fn load_reader_bmp_dispatches_correctly() {
-        use irys_cv::image::Image;
-        use irys_cv::pixel::Srgb8;
+        use fovea::image::Image;
+        use fovea::pixel::Srgb8;
         let img = Image::fill(3, 2, Srgb8::new(42, 84, 126));
         let bytes = bmp::encode(&img, &bmp::BmpEncodeOptions::default()).unwrap();
         let decoded = load_reader(std::io::Cursor::new(&bytes)).unwrap();
@@ -465,8 +465,8 @@ mod tests {
     #[cfg(feature = "bmp")]
     #[test]
     fn load_bmp_returns_metadata() {
-        use irys_cv::image::Image;
-        use irys_cv::pixel::Srgb8;
+        use fovea::image::Image;
+        use fovea::pixel::Srgb8;
         let img = Image::fill(2, 2, Srgb8::new(0, 0, 0));
         let bytes = bmp::encode(&img, &bmp::BmpEncodeOptions::default()).unwrap();
         let decoded = load(&bytes).unwrap();

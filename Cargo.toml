@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/karhunen-loeve/fovea-io"
 
 [dependencies]
-fovea = { version = "0.1.0" }
+fovea = { version = "0.1.0", path = "../fovea" }
 thiserror = "2"
 
 # Codecs — all optional, enable via feature flags
