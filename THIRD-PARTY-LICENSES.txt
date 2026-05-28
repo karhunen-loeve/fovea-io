@@ -1,0 +1,180 @@
+THIRD-PARTY-LICENSES
+====================
+
+The irys-cv-io crate depends on third-party libraries, each under its own
+license. All dependencies use permissive licenses compatible with MIT.
+
+This file documents the licenses and fulfils attribution requirements for
+dependencies whose licenses require it.
+
+
+================================================================================
+Summary of dependency licenses
+================================================================================
+
+License                          Crates
+-------------------------------- -----------------------------------------------
+MIT                              tiff, simd-adler32
+MIT OR Apache-2.0                png, jpeg-decoder, flate2, crc32fast, fdeflate,
+                                 weezl, miniz_oxide, rayon, rayon-core,
+                                 crossbeam-deque, crossbeam-epoch,
+                                 crossbeam-utils, either, bitflags, cfg-if,
+                                 proc-macro2, quote, syn
+(MIT OR Apache-2.0) AND IJG      jpeg-encoder
+(MIT OR Apache-2.0) AND Unicode  unicode-ident
+0BSD OR MIT OR Apache-2.0        adler2
+MIT OR Zlib OR Apache-2.0        miniz_oxide
+
+All "OR" licenses: irys-cv-io elects MIT for each.
+
+The two "AND" licenses carry additional attribution requirements documented
+below.
+
+
+================================================================================
+IJG License — Independent JPEG Group
+================================================================================
+
+Applies to: jpeg-encoder (via quantization tables and algorithmic work derived
+from libjpeg / mozjpeg)
+
+Source: https://jpegclub.org/reference/libjpeg-license/
+
+This software is based in part on the work of the Independent JPEG Group.
+
+LICENSE TERMS
+=============
+
+1. We don't promise that this software works.  (But if you find any bugs,
+   please let us know!)
+2. You can use this software for whatever you want.  You don't have to pay us.
+3. You may not pretend that you wrote this software.  If you use it in a
+   program, you must acknowledge somewhere in your documentation that
+   you've used the IJG code.
+
+In legalese:
+
+The authors make NO WARRANTY or representation, either express or implied,
+with respect to this software, its quality, accuracy, merchantability, or
+fitness for a particular purpose.  This software is provided "AS IS", and you,
+its user, assume the entire risk as to its quality and accuracy.
+
+This software is copyright (C) 1991-2016, Thomas G. Lane, Guido Vollbeding.
+All Rights Reserved except as specified below.
+
+Permission is hereby granted to use, copy, modify, and distribute this
+software (or portions thereof) for any purpose, without fee, subject to these
+conditions:
+(1) If any part of the source code for this software is distributed, then this
+README file must be included, with this copyright and no-warranty notice
+unaltered; and any additions, deletions, or changes to the original files
+must be clearly indicated in accompanying documentation.
+(2) If only executable code is distributed, then the accompanying
+documentation must state that "this software is based in part on the work of
+the Independent JPEG Group".
+(3) Permission for use of this software is granted only if the user accepts
+full responsibility for any undesirable consequences; the authors accept
+NO LIABILITY for damages of any kind.
+
+These conditions apply to any software derived from or based on the IJG code,
+not just to the unmodified library.  If you use our work, you ought to
+acknowledge us.
+
+Permission is NOT granted for the use of any IJG author's name or company name
+in advertising or publicity relating to this software or products derived from
+it.  This software may be referred to only as "the Independent JPEG Group's
+software".
+
+We specifically permit and encourage the use of this software as the basis of
+commercial products, provided that all warranty or liability claims are
+assumed by the product vendor.
+
+
+================================================================================
+Unicode License V3
+================================================================================
+
+Applies to: unicode-ident
+
+Source: https://www.unicode.org/license.txt
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright (C) 1991-2024 Unicode, Inc.
+
+NOTICE TO USER: Carefully read the following legal agreement. BY
+DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
+SOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of data files and any associated documentation (the "Data Files") or
+software and any associated documentation (the "Software") to deal in the
+Data Files or Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Data Files or Software, and to permit persons to whom the
+Data Files or Software are furnished to do so, provided that either (a)
+this copyright and permission notice appear with all copies of the Data
+Files or Software, or (b) this copyright and permission notice appear in
+associated Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+THIRD PARTY RIGHTS.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA
+FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall
+not be used in advertising or otherwise to promote the sale, use or other
+dealings in these Data Files or Software without prior written
+authorization of the copyright holder.
+
+
+================================================================================
+MIT License (representative copy)
+================================================================================
+
+Applies to: all dependencies listed above under MIT and MIT OR Apache-2.0
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+================================================================================
+Notes
+================================================================================
+
+- The IJG license applies only when the "jpeg" feature of irys-cv-io is
+  enabled. If you do not enable JPEG support, the IJG license does not apply
+  to your build.
+
+- The Unicode license applies transitively through proc-macro2 -> unicode-ident,
+  which is used at compile time only (proc-macro dependency). It does not
+  appear in the final binary at runtime.
+
+- This file was generated from the output of:
+    cargo tree -p irys-cv-io --features all-codecs --format "{p} {l}"
+
+  If dependencies change, re-audit with the above command and update this file.
