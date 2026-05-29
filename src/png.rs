@@ -3797,9 +3797,11 @@ mod tests {
 
     #[test]
     fn png_encode_options_clone() {
-        let mut opts = PngEncodeOptions::default();
-        opts.compression_level = Some(3);
-        opts.filter = Some(PngFilterStrategy::Sub);
+        let opts = PngEncodeOptions {
+            compression_level: Some(3),
+            filter: Some(PngFilterStrategy::Sub),
+            ..PngEncodeOptions::default()
+        };
         let opts2 = opts.clone();
         assert_eq!(opts2.compression_level, Some(3));
         assert_eq!(opts2.filter, Some(PngFilterStrategy::Sub));
@@ -4209,13 +4211,15 @@ mod tests {
     #[test]
     fn encode_text_chunk_roundtrip() {
         let image = Image::from_vec(1, 1, vec![Srgb8::new(0, 0, 0)]).unwrap();
-        let mut opts = PngEncodeOptions::default();
-        opts.text_chunks = vec![PngTextChunk {
-            keyword: "Title".into(),
-            text: "Test Image".into(),
-            language: None,
-            translated_keyword: None,
-        }];
+        let opts = PngEncodeOptions {
+            text_chunks: vec![PngTextChunk {
+                keyword: "Title".into(),
+                text: "Test Image".into(),
+                language: None,
+                translated_keyword: None,
+            }],
+            ..PngEncodeOptions::default()
+        };
         let bytes = encode(&image, &opts).unwrap();
         let decoded = decode(&bytes).unwrap();
         assert!(
@@ -4242,8 +4246,10 @@ mod tests {
             minute: 30,
             second: 0,
         };
-        let mut opts = PngEncodeOptions::default();
-        opts.last_modified = Some(ts);
+        let opts = PngEncodeOptions {
+            last_modified: Some(ts),
+            ..PngEncodeOptions::default()
+        };
         let bytes = encode(&image, &opts).unwrap();
         // Must use `decode`, not `decode_reader`, because tIME parsing
         // requires raw byte access.
@@ -4316,8 +4322,10 @@ mod tests {
             ],
         )
         .unwrap();
-        let mut opts = PngEncodeOptions::default();
-        opts.compression_level = Some(9);
+        let opts = PngEncodeOptions {
+            compression_level: Some(9),
+            ..PngEncodeOptions::default()
+        };
         let bytes = encode(&image, &opts).unwrap();
         // Should still decode correctly.
         let decoded = decode(&bytes).unwrap();
@@ -4338,8 +4346,10 @@ mod tests {
             ],
         )
         .unwrap();
-        let mut opts = PngEncodeOptions::default();
-        opts.filter = Some(PngFilterStrategy::Paeth);
+        let opts = PngEncodeOptions {
+            filter: Some(PngFilterStrategy::Paeth),
+            ..PngEncodeOptions::default()
+        };
         let bytes = encode(&image, &opts).unwrap();
         let decoded = decode(&bytes).unwrap();
         assert!(matches!(decoded.image, PngImage::Srgb8(_)));
@@ -4359,8 +4369,10 @@ mod tests {
             ],
         )
         .unwrap();
-        let mut opts = PngEncodeOptions::default();
-        opts.filter = Some(PngFilterStrategy::Adaptive);
+        let opts = PngEncodeOptions {
+            filter: Some(PngFilterStrategy::Adaptive),
+            ..PngEncodeOptions::default()
+        };
         let bytes = encode(&image, &opts).unwrap();
         let decoded = decode(&bytes).unwrap();
         assert!(matches!(decoded.image, PngImage::Srgb8(_)));

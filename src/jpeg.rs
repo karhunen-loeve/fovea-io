@@ -829,52 +829,36 @@ fn parse_tiff_exif(tiff: &[u8]) -> Option<JpegExifInfo> {
 
         match tag {
             // Orientation (SHORT, count=1)
-            0x0112 => {
-                if tiff_type == TIFF_TYPE_SHORT && count == 1 {
-                    if let Some(v) = reader.u16_at(entry_val_off) {
-                        if (1..=8).contains(&v) {
-                            info.orientation = Some(v as u8);
-                        }
+            0x0112 if tiff_type == TIFF_TYPE_SHORT && count == 1 => {
+                if let Some(v) = reader.u16_at(entry_val_off) {
+                    if (1..=8).contains(&v) {
+                        info.orientation = Some(v as u8);
                     }
                 }
             }
             // Make (ASCII)
-            0x010F => {
-                if tiff_type == TIFF_TYPE_ASCII {
-                    info.camera_make =
-                        read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
-                }
+            0x010F if tiff_type == TIFF_TYPE_ASCII => {
+                info.camera_make = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
             }
             // Model (ASCII)
-            0x0110 => {
-                if tiff_type == TIFF_TYPE_ASCII {
-                    info.camera_model =
-                        read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
-                }
+            0x0110 if tiff_type == TIFF_TYPE_ASCII => {
+                info.camera_model = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
             }
             // Software (ASCII)
-            0x0131 => {
-                if tiff_type == TIFF_TYPE_ASCII {
-                    info.software = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
-                }
+            0x0131 if tiff_type == TIFF_TYPE_ASCII => {
+                info.software = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
             }
             // DateTime (ASCII, 20 bytes)
-            0x0132 => {
-                if tiff_type == TIFF_TYPE_ASCII {
-                    info.datetime = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
-                }
+            0x0132 if tiff_type == TIFF_TYPE_ASCII => {
+                info.datetime = read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
             }
             // ExifIFDPointer (LONG)
-            0x8769 => {
-                if count == 1 {
-                    exif_ifd_offset = Some(value_or_offset as usize);
-                }
+            0x8769 if count == 1 => {
+                exif_ifd_offset = Some(value_or_offset as usize);
             }
             // GPSInfoPointer (LONG)
-            0x8825 => {
-                if count == 1 {
-                    gps_ifd_offset = Some(value_or_offset as usize);
-                }
+            0x8825 if count == 1 => {
+                gps_ifd_offset = Some(value_or_offset as usize);
             }
             _ => {}
         }
@@ -894,35 +878,25 @@ fn parse_tiff_exif(tiff: &[u8]) -> Option<JpegExifInfo> {
 
             match tag {
                 // ExposureTime (RATIONAL)
-                0x829A => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 1 {
-                        info.exposure_time = reader.rational_at(value_or_offset as usize);
-                    }
+                0x829A if tiff_type == TIFF_TYPE_RATIONAL && count == 1 => {
+                    info.exposure_time = reader.rational_at(value_or_offset as usize);
                 }
                 // FNumber (RATIONAL)
-                0x829D => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 1 {
-                        info.f_number = reader.rational_at(value_or_offset as usize);
-                    }
+                0x829D if tiff_type == TIFF_TYPE_RATIONAL && count == 1 => {
+                    info.f_number = reader.rational_at(value_or_offset as usize);
                 }
                 // ISOSpeedRatings (SHORT)
-                0x8827 => {
-                    if tiff_type == TIFF_TYPE_SHORT && count == 1 {
-                        info.iso_speed = reader.u16_at(entry_val_off);
-                    }
+                0x8827 if tiff_type == TIFF_TYPE_SHORT && count == 1 => {
+                    info.iso_speed = reader.u16_at(entry_val_off);
                 }
                 // DateTimeOriginal (ASCII)
-                0x9003 => {
-                    if tiff_type == TIFF_TYPE_ASCII {
-                        info.datetime_original =
-                            read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
-                    }
+                0x9003 if tiff_type == TIFF_TYPE_ASCII => {
+                    info.datetime_original =
+                        read_ifd_ascii(&reader, count, value_or_offset, entry_val_off);
                 }
                 // FocalLength (RATIONAL)
-                0x920A => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 1 {
-                        info.focal_length = reader.rational_at(value_or_offset as usize);
-                    }
+                0x920A if tiff_type == TIFF_TYPE_RATIONAL && count == 1 => {
+                    info.focal_length = reader.rational_at(value_or_offset as usize);
                 }
                 _ => {}
             }
@@ -952,54 +926,42 @@ fn parse_tiff_exif(tiff: &[u8]) -> Option<JpegExifInfo> {
 
             match tag {
                 // GPSLatitudeRef (ASCII, 2 bytes: "N\0" or "S\0")
-                0x0001 => {
-                    if tiff_type == TIFF_TYPE_ASCII && count == 2 {
-                        lat_ref = reader.u8_at(entry_val_off);
-                    }
+                0x0001 if tiff_type == TIFF_TYPE_ASCII && count == 2 => {
+                    lat_ref = reader.u8_at(entry_val_off);
                 }
                 // GPSLatitude (3 × RATIONAL = 24 bytes, always offset-referenced)
-                0x0002 => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 3 {
-                        let off = value_or_offset as usize;
-                        if let (Some(d), Some(m), Some(s)) = (
-                            reader.rational_at(off),
-                            reader.rational_at(off + 8),
-                            reader.rational_at(off + 16),
-                        ) {
-                            lat_dms = Some([d, m, s]);
-                        }
+                0x0002 if tiff_type == TIFF_TYPE_RATIONAL && count == 3 => {
+                    let off = value_or_offset as usize;
+                    if let (Some(d), Some(m), Some(s)) = (
+                        reader.rational_at(off),
+                        reader.rational_at(off + 8),
+                        reader.rational_at(off + 16),
+                    ) {
+                        lat_dms = Some([d, m, s]);
                     }
                 }
                 // GPSLongitudeRef (ASCII, 2 bytes: "E\0" or "W\0")
-                0x0003 => {
-                    if tiff_type == TIFF_TYPE_ASCII && count == 2 {
-                        lon_ref = reader.u8_at(entry_val_off);
-                    }
+                0x0003 if tiff_type == TIFF_TYPE_ASCII && count == 2 => {
+                    lon_ref = reader.u8_at(entry_val_off);
                 }
                 // GPSLongitude (3 × RATIONAL)
-                0x0004 => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 3 {
-                        let off = value_or_offset as usize;
-                        if let (Some(d), Some(m), Some(s)) = (
-                            reader.rational_at(off),
-                            reader.rational_at(off + 8),
-                            reader.rational_at(off + 16),
-                        ) {
-                            lon_dms = Some([d, m, s]);
-                        }
+                0x0004 if tiff_type == TIFF_TYPE_RATIONAL && count == 3 => {
+                    let off = value_or_offset as usize;
+                    if let (Some(d), Some(m), Some(s)) = (
+                        reader.rational_at(off),
+                        reader.rational_at(off + 8),
+                        reader.rational_at(off + 16),
+                    ) {
+                        lon_dms = Some([d, m, s]);
                     }
                 }
                 // GPSAltitudeRef (BYTE, count=1: 0 = above, 1 = below sea level)
-                0x0005 => {
-                    if tiff_type == TIFF_TYPE_BYTE && count == 1 {
-                        alt_ref = reader.u8_at(entry_val_off);
-                    }
+                0x0005 if tiff_type == TIFF_TYPE_BYTE && count == 1 => {
+                    alt_ref = reader.u8_at(entry_val_off);
                 }
                 // GPSAltitude (RATIONAL)
-                0x0006 => {
-                    if tiff_type == TIFF_TYPE_RATIONAL && count == 1 {
-                        alt_rational = reader.rational_at(value_or_offset as usize);
-                    }
+                0x0006 if tiff_type == TIFF_TYPE_RATIONAL && count == 1 => {
+                    alt_rational = reader.rational_at(value_or_offset as usize);
                 }
                 _ => {}
             }
@@ -1710,6 +1672,7 @@ pub fn encode_jpeg_image(
 // ═══════════════════════════════════════════════════════════════════════════════
 
 #[cfg(test)]
+#[allow(clippy::erasing_op, clippy::identity_op)]
 mod tests {
     use super::*;
     use fovea::image::ImageView;
@@ -2016,7 +1979,7 @@ mod tests {
     #[test]
     fn jpeg_color_space_clone() {
         let cs = JpegColorSpace::IccTagged;
-        let cloned = cs.clone();
+        let cloned = cs;
         assert_eq!(cs, cloned);
     }
 
@@ -3139,8 +3102,8 @@ mod tests {
     /// after the IFD for offset-referenced values.
     ///
     /// Layout:
-    /// - [0..6]: `Exif\0\0`
-    /// - [6..8]: `II` (LE byte order)
+    /// - [0..6][]: `Exif\0\0`
+    /// - [6..8][]: `II` (LE byte order)
     /// - [8..10]: magic 42
     /// - [10..14]: IFD0 offset = 8 (relative to TIFF start, i.e. byte 14 in raw)
     /// - [14..16]: entry count

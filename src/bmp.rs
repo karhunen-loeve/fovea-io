@@ -2481,7 +2481,7 @@ mod tests {
         let data = [0, 2, 1, 1, 1, 5, 0, 1];
         let result = decompress_rle8(&data, 3, 3).unwrap();
         // After delta, cursor is at (1, 1).
-        assert_eq!(result[1 * 3 + 1], 5);
+        assert_eq!(result[3 + 1], 5);
     }
 
     #[test]
@@ -4491,10 +4491,10 @@ mod tests {
         struct FailWriter;
         impl std::io::Write for FailWriter {
             fn write(&mut self, _buf: &[u8]) -> std::io::Result<usize> {
-                Err(std::io::Error::new(std::io::ErrorKind::Other, "fail"))
+                Err(std::io::Error::other("fail"))
             }
             fn flush(&mut self) -> std::io::Result<()> {
-                Err(std::io::Error::new(std::io::ErrorKind::Other, "fail"))
+                Err(std::io::Error::other("fail"))
             }
         }
 
@@ -4554,7 +4554,7 @@ mod tests {
 
     #[test]
     fn rle8_pixel_offset_beyond_file() {
-        let color_table_size = 1 * 4;
+        let color_table_size = 4;
         let pixel_offset = 14 + 40 + color_table_size;
         // File doesn't extend to pixel_offset.
         let file_len = pixel_offset - 1;
