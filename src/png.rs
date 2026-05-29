@@ -39,8 +39,8 @@
 //!
 //! - **8-bit sRGB → `SrgbMono8`/`SrgbMonoA8`/`Srgb8`/`Srgba8`**.  These
 //!   types do not implement `LinearSpace`, so the compiler rejects
-//!   linear-math operations on gamma-encoded data (ADR-0007).  The sRGB
-//!   transfer function is defined per-channel and applies identically to
+//!   linear-math operations on gamma-encoded data. The sRGB transfer
+//!   function is defined per-channel and applies identically to
 //!   grayscale images.
 //!
 //! - **8-bit linear → `Mono8`/`MonoA8`/`Rgb8`/`Rgba8`**.  Used when the

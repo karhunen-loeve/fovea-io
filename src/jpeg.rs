@@ -74,8 +74,8 @@
 //!
 //! - **`Srgba8` is excluded from [`JpegPixel`].**  JPEG has no alpha
 //!   channel.  Silently dropping alpha would be a lossy conversion hidden
-//!   inside the I/O layer, violating PHILOSOPHY.md §2 ("conversions are
-//!   explicit").  Strip alpha explicitly before encoding.
+//!   inside the I/O layer, violating design principle §4 (conversions are
+//!   named).  Strip alpha explicitly before encoding.
 
 use crate::IoError;
 use fovea::image::{Image, ImageView};
@@ -386,7 +386,7 @@ pub enum JpegPixelDensity {
 ///
 /// JPEG supports exactly two sample precisions: 8-bit (baseline/progressive)
 /// and 12-bit (extended).  A `u8` field would admit 254 invalid states.
-/// Per PHILOSOPHY.md §1 ("the type is the truth"), a two-valued domain is a
+/// Per design principle §1 (types are the spec), a two-valued domain is a
 /// two-variant enum.
 ///
 /// # Examples
@@ -1443,7 +1443,7 @@ pub enum JpegSamplingFactor {
 // Note: ICC profile (`APP2`) embedding and `COM` comment emission are
 // intentionally **not** part of the encode options yet. The previous
 // `icc_profile` / `comments` fields silently dropped their data (the
-// encoder never wrote them), which violates `PHILOSOPHY.md` §4 and §7–§8
+// encoder never wrote them), which violates design principles §4 and §7–§8
 // (no silent data loss; I/O must preserve format fidelity). Because the
 // struct is `#[non_exhaustive]`, those fields can be reintroduced with a
 // real implementation later without a semver-major bump.
@@ -1493,7 +1493,7 @@ mod jpeg_pixel_sealed {
 ///
 /// `Srgba8` is deliberately **excluded**.  JPEG does not support alpha;
 /// encoding `Srgba8` would silently discard the alpha channel — a lossy
-/// conversion that violates PHILOSOPHY.md §2.  Strip alpha explicitly
+/// conversion that violates design principle §4.  Strip alpha explicitly
 /// before encoding.
 ///
 /// `Rgb8` and `Mono8` (linear) are excluded because JPEG is sRGB by

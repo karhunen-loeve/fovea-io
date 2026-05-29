@@ -250,7 +250,7 @@ impl std::fmt::Debug for BmpImage {
 /// Source bits per pixel as stored in the BMP file.
 ///
 /// BMP supports exactly six bit-depth values.  A `u8` would admit 250
-/// invalid states — per PHILOSOPHY.md §1 ("the type is the truth"),
+/// invalid states — per design principle §1 (types are the spec),
 /// a six-valued domain is a six-variant enum.
 ///
 /// This enum is deliberately **not** `#[non_exhaustive]` — these are

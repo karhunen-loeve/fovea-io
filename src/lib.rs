@@ -1,26 +1,4 @@
-//! Image I/O for fovea — feature-gated codec support.
-//!
-//! # Architecture
-//!
-//! - **Per-codec exhaustive enums** — each codec defines its own output enum
-//!   (e.g. [`png::PngImage`]) whose variants carry concrete `Image<P>`
-//!   values.  These enums are the primary API for users who know the format.
-//!
-//! - **Per-codec decoded structs** — each codec returns a `#[non_exhaustive]`
-//!   struct (e.g. [`png::PngDecoded`]) containing both the pixel data and
-//!   ancillary metadata.  Metadata construction is essentially free because
-//!   codec crates parse ancillary chunks during decoding regardless.
-//!
-//! - **Top-level convenience** — [`DecodedImage`] is a `#[non_exhaustive]`
-//!   union of all per-codec decoded structs, returned by [`load`] for users
-//!   who want format-agnostic decoding.
-//!
-//! - **Feature-gated codecs** — one Cargo feature per codec, none enabled by
-//!   default.  The core crate stays dependency-free.
-//!
-//! - **Encoding is generic** — encode paths accept
-//!   `&(impl ImageView<Pixel = P> + PlainImage)` where `P: PlainPixel`,
-//!   so no variant dispatch is needed.  Only decoding returns variant enums.
+#![doc = include_str!("../README.md")]
 
 mod error;
 
