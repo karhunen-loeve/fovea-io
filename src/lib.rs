@@ -1,14 +1,21 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![warn(missing_docs)]
+#![warn(unreachable_pub)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 mod error;
 
 #[cfg(feature = "png")]
+#[cfg_attr(docsrs, doc(cfg(feature = "png")))]
 pub mod png;
 
 #[cfg(feature = "jpeg")]
+#[cfg_attr(docsrs, doc(cfg(feature = "jpeg")))]
 pub mod jpeg;
 
 #[cfg(feature = "bmp")]
+#[cfg_attr(docsrs, doc(cfg(feature = "bmp")))]
 pub mod bmp;
 
 pub use error::IoError;
@@ -99,14 +106,17 @@ pub enum DecodedImage {
     /// A decoded PNG file — pixel data + metadata.
     /// Only available with the `png` feature.
     #[cfg(feature = "png")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "png")))]
     Png(png::PngDecoded),
     /// A decoded JPEG file — pixel data + metadata.
     /// Only available with the `jpeg` feature.
     #[cfg(feature = "jpeg")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "jpeg")))]
     Jpeg(jpeg::JpegDecoded),
     /// A decoded BMP file — pixel data + metadata.
     /// Only available with the `bmp` feature.
     #[cfg(feature = "bmp")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "bmp")))]
     Bmp(bmp::BmpDecoded),
 }
 

@@ -1,23 +1,43 @@
 [package]
-name = "fovea-io"
-version = "0.1.0"
-edition = "2024"
-license = "MIT"
-description = "Image I/O codec support for fovea"
-readme = "README.md"
-repository = "https://github.com/karhunen-loeve/fovea-io"
+name                   = "fovea-io"
+description            = "Feature-gated PNG, JPEG, and BMP codecs for fovea images"
+version.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+license.workspace      = true
+authors.workspace      = true
+readme                 = "README.md"
+repository             = "https://github.com/karhunen-loeve/fovea-io"
+homepage               = "https://github.com/karhunen-loeve/fovea-io"
+documentation          = "https://docs.rs/fovea-io"
+keywords               = ["image", "png", "jpeg", "bmp", "fovea"]
+categories             = ["multimedia::images", "multimedia::encoding", "encoding"]
+include = [
+    "src/**/*.rs",
+    "tests/**/*.rs",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "THIRD-PARTY-LICENSES.txt",
+]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-fovea = { version = "0.1.0", path = "../fovea" }
+fovea     = { version = "0.1.1", path = "../fovea" }
 thiserror = "2"
 
 # Codecs — all optional, enable via feature flags
-png = { version = "0.17", optional = true }
+png          = { version = "0.17", optional = true }
 jpeg-decoder = { version = "0.3", optional = true }
 jpeg-encoder = { version = "0.6", optional = true }
 
 [features]
-default = []
-bmp = []  # Pure Rust — no codec crate needed
-jpeg = ["jpeg-decoder", "jpeg-encoder"]
+default    = []
+bmp        = []                                       # Pure Rust — no codec crate needed
+png        = ["dep:png"]
+jpeg       = ["dep:jpeg-decoder", "dep:jpeg-encoder"]
 all-codecs = ["png", "jpeg", "bmp"]

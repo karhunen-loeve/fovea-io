@@ -1,42 +1,50 @@
 THIRD-PARTY-LICENSES
 ====================
 
-The irys-cv-io crate depends on third-party libraries, each under its own
-license. All dependencies use permissive licenses compatible with MIT.
+The `fovea-io` crate depends on third-party libraries, each under its own
+license. All dependencies are under permissive licenses compatible with the
+MIT license under which `fovea-io` itself is distributed.
 
-This file documents the licenses and fulfils attribution requirements for
-dependencies whose licenses require it.
+This file documents those licenses and fulfils the attribution requirements
+for the dependencies whose licenses require it.
+
+This audit reflects the dependency tree for `fovea-io 0.1.1` built with the
+`all-codecs` feature (`png`, `jpeg`, `bmp`). With a narrower feature set,
+fewer dependencies apply — see the "Per-feature applicability" section at the
+bottom of this file.
 
 
 ================================================================================
 Summary of dependency licenses
 ================================================================================
 
-License                          Crates
--------------------------------- -----------------------------------------------
-MIT                              tiff, simd-adler32
-MIT OR Apache-2.0                png, jpeg-decoder, flate2, crc32fast, fdeflate,
-                                 weezl, miniz_oxide, rayon, rayon-core,
-                                 crossbeam-deque, crossbeam-epoch,
-                                 crossbeam-utils, either, bitflags, cfg-if,
-                                 proc-macro2, quote, syn
-(MIT OR Apache-2.0) AND IJG      jpeg-encoder
-(MIT OR Apache-2.0) AND Unicode  unicode-ident
-0BSD OR MIT OR Apache-2.0        adler2
-MIT OR Zlib OR Apache-2.0        miniz_oxide
+License (SPDX)                            Crates
+----------------------------------------- -------------------------------------
+MIT                                       simd-adler32
+MIT OR Apache-2.0                         png, jpeg-decoder, flate2, fdeflate,
+                                          crc32fast, cfg-if, either, thiserror,
+                                          thiserror-impl, rayon, rayon-core,
+                                          crossbeam-deque, crossbeam-epoch,
+                                          crossbeam-utils, proc-macro2, quote,
+                                          syn
+MIT/Apache-2.0                            bitflags
+(MIT OR Apache-2.0) AND IJG               jpeg-encoder
+(MIT OR Apache-2.0) AND Unicode-3.0       unicode-ident
+0BSD OR MIT OR Apache-2.0                 adler2
+MIT OR Zlib OR Apache-2.0                 miniz_oxide
 
-All "OR" licenses: irys-cv-io elects MIT for each.
-
-The two "AND" licenses carry additional attribution requirements documented
-below.
+`fovea-io` elects **MIT** from every `OR` expression above for its own
+distribution. Each "AND" component carries an additional requirement
+documented in the corresponding section below.
 
 
 ================================================================================
 IJG License — Independent JPEG Group
 ================================================================================
 
-Applies to: jpeg-encoder (via quantization tables and algorithmic work derived
-from libjpeg / mozjpeg)
+Applies to: jpeg-encoder (via quantization tables and algorithmic work
+derived from libjpeg / mozjpeg). Only relevant when `fovea-io` is built with
+the `jpeg` feature.
 
 Source: https://jpegclub.org/reference/libjpeg-license/
 
@@ -94,7 +102,9 @@ assumed by the product vendor.
 Unicode License V3
 ================================================================================
 
-Applies to: unicode-ident
+Applies to: unicode-ident (transitively, via proc-macro2 → unicode-ident, and
+syn → unicode-ident). Used at compile time only by procedural macros; the
+crate is not linked into the final runtime binary.
 
 Source: https://www.unicode.org/license.txt
 
@@ -141,7 +151,9 @@ authorization of the copyright holder.
 MIT License (representative copy)
 ================================================================================
 
-Applies to: all dependencies listed above under MIT and MIT OR Apache-2.0
+Applies to: every dependency listed above whose SPDX expression includes
+"MIT" (i.e. all of the dependencies — `fovea-io` elects MIT from each `OR`
+expression).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -163,18 +175,46 @@ SOFTWARE.
 
 
 ================================================================================
-Notes
+Per-feature applicability
 ================================================================================
 
-- The IJG license applies only when the "jpeg" feature of irys-cv-io is
-  enabled. If you do not enable JPEG support, the IJG license does not apply
-  to your build.
+`fovea-io` ships every codec behind a Cargo feature flag. The set of
+third-party dependencies — and therefore the attribution requirements —
+depends on which features are enabled:
 
-- The Unicode license applies transitively through proc-macro2 -> unicode-ident,
-  which is used at compile time only (proc-macro dependency). It does not
-  appear in the final binary at runtime.
+- `bmp`   — pure Rust, no third-party codec dependencies. Builds with this
+            feature alone require no third-party attribution beyond
+            `thiserror`'s MIT notice.
+- `png`   — pulls `png`, `flate2`, `miniz_oxide`, `adler2`, `crc32fast`,
+            `fdeflate`, `simd-adler32`, `bitflags`, `cfg-if`. All
+            MIT-compatible; no IJG.
+- `jpeg`  — pulls `jpeg-decoder`, `jpeg-encoder`, `rayon` and its
+            crossbeam dependencies. **The IJG acknowledgement above is
+            required** when this feature is enabled.
+- `all-codecs` — equivalent to `bmp + png + jpeg`, so the full table at
+                 the top of this file applies.
 
-- This file was generated from the output of:
-    cargo tree -p irys-cv-io --features all-codecs --format "{p} {l}"
+In every case, `proc-macro2` / `quote` / `syn` / `unicode-ident` are
+transitive build-time-only dependencies (via `fovea-derive` and
+`thiserror-impl`); they do not appear in the final runtime binary.
 
-  If dependencies change, re-audit with the above command and update this file.
+
+================================================================================
+Auditing
+================================================================================
+
+This file was prepared by reviewing the output of
+
+    cargo tree -p fovea-io --features all-codecs --format "{p} {l}"
+
+against the dependency tree resolved by Cargo at the time of this release.
+
+When dependencies change (a `Cargo.toml` edit that adds, removes, or major-
+upgrades a third-party crate), re-run the command above and refresh this
+file. A new entry is required only when:
+
+  1. A new transitive crate is introduced, **and**
+  2. its license is not already listed in the summary table.
+
+A version bump of an already-listed crate does not require an update unless
+the crate's license changes.

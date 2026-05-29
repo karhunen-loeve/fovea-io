@@ -2,14 +2,14 @@
 
 [![Crates.io](https://img.shields.io/crates/v/fovea-io.svg)](https://crates.io/crates/fovea-io)
 [![Documentation](https://docs.rs/fovea-io/badge.svg)](https://docs.rs/fovea-io)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/karhunen-loeve/fovea-io/blob/main/LICENSE)
 
 `fovea-io` adds feature-gated PNG, JPEG, and BMP codecs for [`fovea`](https://github.com/karhunen-loeve/fovea) images.
 
 ```toml
 [dependencies]
-fovea = "0.1.0"
-fovea-io = { version = "0.1.0", features = ["png"] }
+fovea = "0.1.1"
+fovea-io = { version = "0.1.1", features = ["png"] }
 ```
 
 ## Features
@@ -27,9 +27,9 @@ Enable features in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-fovea-io = { version = "0.1.0", features = ["jpeg"] }
+fovea-io = { version = "0.1.1", features = ["jpeg"] }
 # or enable everything:
-# fovea-io = { version = "0.1.0", features = ["all-codecs"] }
+# fovea-io = { version = "0.1.1", features = ["all-codecs"] }
 ```
 
 ## Quick start
@@ -132,10 +132,10 @@ std::fs::write("output.bmp", bytes).unwrap();
 
 ## License
 
-`fovea-io` itself is licensed under the [MIT License](LICENSE).
+`fovea-io` itself is licensed under the [MIT License](https://github.com/karhunen-loeve/fovea-io/blob/main/LICENSE).
 
 When the `jpeg` feature is enabled, this crate depends on [`jpeg-encoder`](https://crates.io/crates/jpeg-encoder), which carries an additional **IJG (Independent JPEG Group)** license requiring this acknowledgement:
 
 > This software is based in part on the work of the Independent JPEG Group.
 
-See [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt) for full license texts of dependencies and attribution requirements.
+See [THIRD-PARTY-LICENSES.txt](https://github.com/karhunen-loeve/fovea-io/blob/main/THIRD-PARTY-LICENSES.txt) for full license texts of dependencies and attribution requirements.
