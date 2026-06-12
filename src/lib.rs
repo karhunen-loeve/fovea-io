@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![warn(missing_docs)]
+#![deny(missing_docs)]
 #![warn(unreachable_pub)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
@@ -30,8 +30,11 @@ pub use error::IoError;
 /// correct codec.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFormat {
+    /// Portable Network Graphics.
     Png,
+    /// JPEG / JFIF compressed image.
     Jpeg,
+    /// Windows Bitmap.
     Bmp,
 }
 

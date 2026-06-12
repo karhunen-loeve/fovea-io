@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-06-12
+
+### Changed
+
+- `#![warn(missing_docs)]` promoted to `#![deny(missing_docs)]`. All
+  public API items are now documented; the deny lint enforces that new
+  public items ship with docs.
+- Minimum required version of `fovea` bumped to `0.2.0`.
+
+### Fixed
+
+- `fovea-io/src/png.rs`: fixed two broken intra-doc links that caused
+  `cargo doc -p fovea-io` to fail with `#![deny(rustdoc::broken_intra_doc_links)]`:
+  - The stale `[read_png](crate::read_png)` link on `PngImage` — there is
+    no `read_png` at the crate root. Repointed to `crate::load` and
+    `crate::png::decode`, which are the actual public entry points.
+  - The `[TransferAssumption]` link in the `PngImage` colour-type table —
+    `TransferAssumption` is a crate-private enum that rustdoc rejects as a
+    link target from a public item. Converted to inline code with a
+    "(crate-private)" note; the explanatory prose is unchanged.
+
 ## [0.1.1] — 2026-05-29
 
 First real public release. `0.1.0` was a name-reservation placeholder.
@@ -26,4 +47,5 @@ First real public release. `0.1.0` was a name-reservation placeholder.
 - Three-tier error type `IoError` covering format detection failures,
   unsupported pixel formats, and per-codec decode/encode errors.
 
+[0.2.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/karhunen-loeve/fovea-io/releases/tag/v0.1.1

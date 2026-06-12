@@ -4,131 +4,134 @@
 [![Documentation](https://docs.rs/fovea-io/badge.svg)](https://docs.rs/fovea-io)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/karhunen-loeve/fovea-io/blob/main/LICENSE)
 
-`fovea-io` adds feature-gated PNG, JPEG, and BMP codecs for [`fovea`](https://github.com/karhunen-loeve/fovea) images.
+`fovea-io` is the file boundary for fovea: decode PNG, JPEG, and BMP bytes into typed `fovea::Image<P>` values, then let the core crate enforce pixel semantics from there.
 
-```toml
-[dependencies]
-fovea = "0.1.1"
-fovea-io = { version = "0.1.1", features = ["png"] }
+The key idea is simple: I/O tells you what the file contains. It does not silently decide how to process it. Metadata travels with pixels, color conversions are explicit, and unsupported encodes are compile-time errors where possible.
+
+## Install
+
+No codecs are enabled by default. Enable only the formats you need:
+
+```sh
+cargo add fovea
+cargo add fovea-io --features png
+```
+
+Enable every current codec with:
+
+```sh
+cargo add fovea-io --features all-codecs
 ```
 
 ## Features
 
-Each codec is behind its own Cargo feature flag. No codecs are enabled by default.
-
-| Feature | Codecs enabled | Dependencies |
+| Feature | Enables | Pulls in |
 |---|---|---|
-| `png` | PNG decode + encode | [`png`](https://crates.io/crates/png) |
-| `jpeg` | JPEG decode + encode | [`jpeg-decoder`](https://crates.io/crates/jpeg-decoder), [`jpeg-encoder`](https://crates.io/crates/jpeg-encoder) |
-| `bmp` | BMP decode + encode | none beyond `fovea-io` |
+| `png` | PNG decode + encode | `png` |
+| `jpeg` | JPEG decode + encode | `jpeg-decoder`, `jpeg-encoder` |
+| `bmp` | BMP decode + encode | no external codec crate |
 | `all-codecs` | PNG, JPEG, and BMP | all optional codec dependencies |
 
-Enable features in your `Cargo.toml`:
+## The fovea I/O model
 
-```toml
-[dependencies]
-fovea-io = { version = "0.1.1", features = ["jpeg"] }
-# or enable everything:
-# fovea-io = { version = "0.1.1", features = ["all-codecs"] }
+```text
+bytes → detect/decode → per-codec enum → concrete Image<P> → explicit transforms → encode
 ```
 
-## Quick start
-
-Feature-free format detection works without enabling a codec:
+`load` is convenient when you do not know the file format. Per-codec APIs are better when you do know the format, because their image enums are exhaustive spec sheets.
 
 ```rust
-use fovea_io::{detect_format, ImageFormat};
+use fovea_io::{ImageFormat, detect_format};
 
 let png_sig = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 assert_eq!(detect_format(&png_sig), Some(ImageFormat::Png));
+assert_eq!(detect_format(&[0x00, 0x00]), None);
 ```
 
-With codec features enabled, decode into per-format enums whose variants carry concrete typed images:
+## Decode once, then work with types
 
 ```rust,ignore
-use fovea_io::{load, DecodedImage};
-
-let bytes = std::fs::read("image.jpg").unwrap();
-match load(&bytes).unwrap() {
-    DecodedImage::Jpeg(decoded) => {
-        println!("JPEG {}x{}", decoded.image.width(), decoded.image.height());
-    }
-    DecodedImage::Png(decoded) => {
-        println!("PNG {}x{}", decoded.image.width(), decoded.image.height());
-    }
-    DecodedImage::Bmp(decoded) => {
-        println!("BMP {}x{}", decoded.image.width(), decoded.image.height());
-    }
-    _ => {}
-}
-```
-
-## Codec examples
-
-### JPEG
-
-```rust,ignore
-use fovea::image::Image;
-use fovea::pixel::Srgb8;
-use fovea_io::jpeg::{self, JpegEncodeOptions, JpegImage};
-
-let bytes = std::fs::read("photo.jpg").unwrap();
-let decoded = jpeg::decode(&bytes).unwrap();
-
-match decoded.image {
-    JpegImage::Srgb8(image) => println!("RGB JPEG: {}x{}", image.width(), image.height()),
-    JpegImage::SrgbMono8(image) => println!("grayscale JPEG: {}x{}", image.width(), image.height()),
-    JpegImage::SrgbMono16(image) => println!("extended grayscale JPEG: {}x{}", image.width(), image.height()),
-}
-
-let image = Image::fill(320, 240, Srgb8::new(128, 64, 32));
-let bytes = jpeg::encode(&image, &JpegEncodeOptions::default()).unwrap();
-std::fs::write("output.jpg", bytes).unwrap();
-```
-
-### PNG
-
-```rust,ignore
+use fovea::image::ImageView;
 use fovea_io::png::{self, PngImage};
 
-let bytes = std::fs::read("image.png").unwrap();
-let decoded = png::decode(&bytes).unwrap();
+let bytes = std::fs::read("input.png")?;
+let decoded = png::decode(&bytes)?;
 
 match decoded.image {
-    PngImage::Srgb8(image) => println!("8-bit sRGB PNG: {}x{}", image.width(), image.height()),
-    PngImage::Srgba8(image) => println!("8-bit sRGBA PNG: {}x{}", image.width(), image.height()),
-    _ => println!("another PNG pixel format"),
+    PngImage::Srgb8(img) => {
+        println!("8-bit sRGB PNG: {}x{}", img.width(), img.height());
+        // img is Image<Srgb8>
+    }
+    PngImage::Srgba8(img) => {
+        println!("8-bit sRGBA PNG: {}x{}", img.width(), img.height());
+        // img is Image<Srgba8>
+    }
+    other => {
+        println!("supported PNG, different pixel format: {other:?}");
+    }
 }
 ```
 
-### BMP
+After the match, downstream code has concrete pixel types. A resize pipeline can reject gamma-incorrect interpolation; a display path can require display-ready pixels; a camera pipeline can keep raw linear data linear.
+
+## Decode → transform → encode
+
+This is the common shape for file tools:
 
 ```rust,ignore
+use fovea::Size;
 use fovea::image::Image;
-use fovea::pixel::Srgb8;
-use fovea_io::bmp::{self, BmpEncodeOptions};
+use fovea::pixel::{RgbF32, Srgb8};
+use fovea::transform::{Bilinear, SrgbGamma, convert_image, resize};
+use fovea_io::png::{self, PngEncodeOptions, PngImage};
 
-let image = Image::fill(320, 240, Srgb8::new(0, 0, 0));
-let bytes = bmp::encode(&image, &BmpEncodeOptions::default()).unwrap();
-std::fs::write("output.bmp", bytes).unwrap();
+let bytes = std::fs::read("photo.png")?;
+let decoded = png::decode(&bytes)?;
+
+let srgb: Image<Srgb8> = match decoded.image {
+    PngImage::Srgb8(img) => img,
+    other => return Err(format!("expected Srgb8 PNG, got {other:?}").into()),
+};
+
+// Bilinear resize is done in linear light.
+let linear: Image<RgbF32> = convert_image(&srgb, SrgbGamma);
+let resized: Image<RgbF32> = resize(&linear, Size::new(800, 600), Bilinear);
+let output: Image<Srgb8> = convert_image(&resized, SrgbGamma);
+
+let out_bytes = png::encode(&output, &PngEncodeOptions::default())?;
+std::fs::write("photo_800x600.png", out_bytes)?;
 ```
 
-## Architecture
+The I/O crate does not hide the `SrgbGamma` step. That is deliberate: decoding surfaces information; your pipeline chooses what to do with it.
 
-- **Per-codec exhaustive enums** — each codec defines its own output enum, such as `PngImage`, `JpegImage`, or `BmpImage`, whose variants carry concrete `Image<P>` values.
-- **Metadata travels with pixels** — decoded structs return pixel data and format-specific metadata together.
-- **Feature-gated codecs** — enabling one codec does not pull in the dependencies for another.
-- **Sealed encode traits** — `PngPixel`, `JpegPixel`, and `BmpPixel` make unsupported output formats compile-time errors.
+## Which entry point?
 
-## Design principle references
+| You know... | Use | Why |
+|---|---|---|
+| Nothing except "these are image bytes" | `load` / `load_reader` | Detects PNG/JPEG/BMP by magic bytes and returns `DecodedImage`. |
+| The file is PNG | `png::decode` / `png::encode` | Exhaustive PNG pixel enum and PNG metadata. |
+| The file is JPEG | `jpeg::decode` / `jpeg::encode` | JPEG-specific metadata and supported JPEG pixel shapes. |
+| The file is BMP | `bmp::decode` / `bmp::encode` | BMP-specific representation without pulling in PNG/JPEG dependencies. |
+| Only the signature matters | `detect_format` | Cheap format detection without codec features. |
 
-`§N` references throughout this crate refer to the numbered design principles listed in the [`fovea` crate documentation](https://docs.rs/fovea).
+## Metadata is not policy
 
-## Part of the fovea project
+Decoded values carry metadata alongside pixel data. fovea-io reports what the file said; it does not silently linearize, premultiply alpha, apply profiles, or drop ancillary data on your behalf.
 
-- Core crate: [`fovea`](https://github.com/karhunen-loeve/fovea)
-- Display support: [`fovea-display`](https://github.com/karhunen-loeve/fovea-display)
-- End-to-end demos: [`fovea-examples`](https://github.com/karhunen-loeve/fovea-examples)
+That policy keeps I/O predictable:
+
+- The decode boundary preserves file facts.
+- The transform boundary names semantic changes.
+- The encode boundary checks whether the target format can represent the requested pixel type.
+
+## Crate ecosystem
+
+| Crate | Purpose |
+|---|---|
+| `fovea` | Core image types, pixels, transforms, and analysis. |
+| `fovea-io` | File codecs for typed fovea images. |
+| `fovea-display` | Display strategies and debug windows. |
+| `fovea-examples` | Repo-only end-to-end programs using all crates together. |
 
 ## License
 

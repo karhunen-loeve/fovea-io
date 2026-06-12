@@ -126,7 +126,7 @@ use crate::IoError;
 /// Transfer function detection uses colour-space metadata chunks in PNG
 /// priority order (`cICP` > `iCCP` > `sRGB` > `gAMA`+`cHRM`).  For
 /// untagged PNGs (no colour-space chunk): 8-bit defaults to sRGB, 16-bit
-/// defaults to linear.  See [`TransferAssumption`] (crate-private).
+/// defaults to linear.  See `TransferAssumption` (crate-private).
 ///
 /// | PNG colour type  | Bit depth | Transfer | Variant        | Pixel type      |
 /// |------------------|-----------|----------|----------------|-----------------|
@@ -192,6 +192,13 @@ impl std::fmt::Debug for PngImage {
     }
 }
 
+/// A decoded PNG image whose concrete pixel type is determined by the PNG file's metadata.
+///
+/// A PNG header fixes the bit depth and colour type — the decoded pixel type is a property
+/// of the file, not the caller. `PngImage` carries the decoded `Image<T>` together with its
+/// concrete type so callers can match on the variant they actually need.
+///
+/// See [`load`](crate::load) or [`png::decode`](crate::png::decode) for how to obtain a `PngImage`.
 pub enum PngImage {
     // ── 8-bit sRGB (gamma-encoded, no `LinearSpace`) ─────────────────────
     /// 8-bit sRGB grayscale (sub-byte depths expanded with full-range scaling).
