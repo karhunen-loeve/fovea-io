@@ -1,0 +1,34 @@
+name: Changelog
+
+# Guards the one invariant that reaches users without anyone reviewing it:
+# a released CHANGELOG section must keep describing the version that
+# shipped. docs.rs serves this file, and the release commit that cuts
+# `[Unreleased]` into `[X.Y.Z]` lives only on `main`, so nothing on
+# `develop` catches a lost or rewritten release section by itself.
+#
+# Runs on `develop` too, not just `main`: `develop` is where the damage
+# happens, and catching it at the release is too late.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  immutable-sections:
+    name: Released sections unchanged
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The check compares against every `vX.Y.Z` tag, so it needs the
+          # full history — a shallow clone has no tags and the script fails
+          # loudly rather than passing vacuously.
+          fetch-depth: 0
+
+      - name: Check released CHANGELOG sections are unchanged
+        run: sh .github/scripts/check-changelog-immutable.sh
