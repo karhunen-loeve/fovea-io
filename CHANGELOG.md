@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-09-18
+
+Released for ecosystem-version alignment; no functional changes.
+
 ## [0.4.0] — 2026-09-05
 
 ### Changed
@@ -67,6 +71,7 @@ First real public release. `0.1.0` was a name-reservation placeholder.
 - Three-tier error type `IoError` covering format detection failures,
   unsupported pixel formats, and per-codec decode/encode errors.
 
+[0.5.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.1.1...v0.2.0
