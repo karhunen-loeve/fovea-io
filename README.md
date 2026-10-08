@@ -95,7 +95,7 @@ let srgb: Image<Srgb8> = match decoded.image {
 
 // Bilinear resize is done in linear light.
 let linear: Image<RgbF32> = convert_image(&srgb, SrgbGamma);
-let resized: Image<RgbF32> = resize(&linear, Size::new(800, 600), Bilinear);
+let resized: Image<RgbF32> = resize(&linear, Size::new(800, 600), Bilinear)?;
 let output: Image<Srgb8> = convert_image(&resized, SrgbGamma);
 
 let out_bytes = png::encode(&output, &PngEncodeOptions::default())?;
