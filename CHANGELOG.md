@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-10-30
+
 ### Documentation
 
 - The README's example handles the `Result` that `fovea::transform::resize`
@@ -80,6 +82,7 @@ First real public release. `0.1.0` was a name-reservation placeholder.
 - Three-tier error type `IoError` covering format detection failures,
   unsupported pixel formats, and per-codec decode/encode errors.
 
+[0.6.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/karhunen-loeve/fovea-io/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/karhunen-loeve/fovea-io/compare/v0.3.0...v0.4.0
